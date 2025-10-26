@@ -1,0 +1,12 @@
+---
+- name: Create rclone config directory
+  ansible.builtin.file:
+    path: "{{ rclone_config_path }}"
+    state: directory
+    mode: '0700'
+
+- name: Deploy rclone config (Google Drive)
+  ansible.builtin.template:
+    src: rclone.conf.j2
+    dest: "{{ rclone_config_path }}/rclone.conf"
+    mode: '0600'

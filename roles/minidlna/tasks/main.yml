@@ -1,0 +1,23 @@
+---
+- name: Ensure minidlna is started and enabled
+  ansible.builtin.systemd_service:
+    name: minidlna
+    state: started
+    enabled: yes
+  become: true
+
+- name: Deploy minidlna configuration
+  ansible.builtin.template:
+    src: minidlna.conf.j2
+    dest: /etc/minidlna.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Restart minidlna to apply configuration changes
+  ansible.builtin.systemd_service:
+    name: minidlna
+    state: restarted
+    daemon_reload: yes
+  become: true

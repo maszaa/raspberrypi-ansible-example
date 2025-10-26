@@ -1,0 +1,41 @@
+---
+- name: Deploy Dy.fi ip updater systemd service
+  ansible.builtin.template:
+    src: systemd/dy-fi-ip-updater.service.j2
+    dest: /etc/systemd/system/dy-fi-ip-updater.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Restart Dy.fi ip updater
+
+- name: Create Dy.fi ip updater log directory
+  ansible.builtin.file:
+    path: "{{ code_dy_fi_ip_updater_log_path }}"
+    state: directory
+
+- name: Create log file for Dy.fi ip updater
+  ansible.builtin.file:
+    path: "{{ code_dy_fi_ip_updater_log_file_path }}"
+    state: touch
+
+- name: Get Dy.fi ip updater code
+  ansible.builtin.git:
+    repo: "git@github.com:maszaa/dy-fi-ip-updater.git"
+    key_file: "{{ ansible_user_ssh_key_private_file_path }}"
+    dest: "{{ code_dy_fi_ip_updater_path }}"
+  notify: Restart Dy.fi ip updater
+
+- name: Install Dy.fi ip updater dependencies
+  ansible.builtin.pip:
+    requirements: "{{ code_dy_fi_ip_updater_path }}/requirements.txt"
+    virtualenv: "{{ code_dy_fi_ip_updater_path }}/venv"
+    chdir: "{{ code_dy_fi_ip_updater_path }}"
+  notify: Restart Dy.fi ip updater
+
+- name: Create Dy.fi ip updater environment file
+  ansible.builtin.template:
+    src: scripts/dy_fi_ip_ip_updater_env.sh.j2
+    dest: "{{ code_dy_fi_ip_updater_path }}/env.sh"
+    mode: '0600'
+  notify: Restart Dy.fi ip updater

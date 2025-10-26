@@ -1,0 +1,13 @@
+{{ ansible_user_log_path }}/*/*.log
+{
+    notifempty
+    missingok
+    rotate 5
+    start 1
+    monthly
+    copytruncate
+    compress
+    lastaction
+        chown -R {{ ansible_user }}:{{ ansible_user }} {{ ansible_user_log_path }}
+    endscript
+}

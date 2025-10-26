@@ -1,0 +1,32 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+
+ansible_host_ip: "<Your Raspberry Pi LAN IP address>"
+
+ansible_user: "{{ ansible_user | default('pi') }}"
+ansible_user_home_path: "/home/{{ ansible_user }}"
+
+ansible_user_ssh_dir: "{{ ansible_user_home_path }}/.ssh"
+ansible_user_ssh_key_name: "<name for SSH private key file to authenticate to Github>"
+ansible_user_ssh_key_private_file_path: "{{ ansible_user_ssh_dir }}/{{ ansible_user_ssh_key_name }}"
+
+ansible_user_software_path: "{{ ansible_user_home_path }}/software"
+
+ansible_user_log_path: "{{ ansible_user_home_path }}/log"
+
+ansible_user_docker_socket: "unix:///run/user/1000/docker.sock"
+
+code_path: "{{ ansible_user_home_path }}/code"
+code_scripts_path: "{{ code_path }}/scripts"
+
+code_default_log_file_name: "log.log"
+
+code_dy_fi_ip_updater_path: "{{ code_path }}/dy-fi-ip-updater"
+code_dy_fi_ip_updater_log_path: "{{ ansible_user_log_path }}/dy-fi-ip-updater"
+code_dy_fi_ip_updater_log_file_path: "{{ code_dy_fi_ip_updater_log_path }}/{{ code_default_log_file_name }}"
+
+code_heos_scrobbler_path: "{{ code_path }}/heos-scrobbler"
+code_heos_scrobbler_log_path: "{{ ansible_user_log_path }}/heos-scrobbler"
+code_heos_scrobbler_log_file_path: "{{ code_heos_scrobbler_log_path }}/{{ code_default_log_file_name }}"
+
+rclone_google_drive_remote_name: "Google Drive"

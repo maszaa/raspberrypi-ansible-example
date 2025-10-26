@@ -1,0 +1,12 @@
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    ports:
+      - "{{ ansible_host_ip }}:8123:8123"
+    volumes:
+      - {{ homeassistant_config_path }}:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: bridge

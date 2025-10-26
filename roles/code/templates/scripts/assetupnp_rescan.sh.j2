@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+ASSETUPNP_URL="http://localhost:45537"
+ASSETUPNP_RESCAN_URL="$ASSETUPNP_URL/rescanall"
+
+flock --verbose -n /tmp/asset-rescanall.lock \
+	curl "$ASSETUPNP_RESCAN_URL" \
+		-H "Origin: $ASSETUPNP_URL" \
+		-H "Content-Type: application/x-www-form-urlencoded" \
+		-H "Referer: $ASSETUPNP_RESCAN_URL" \
+					-X POST \
+		--data "PIN={{ vault_assetupnp_pin }}" \
+		-fsS > /dev/null
+
+curl -fs --retry 3 {{ vault_healtcheck_ping_url_assetupnp_rescan }} > /dev/null

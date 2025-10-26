@@ -1,0 +1,30 @@
+---
+- name: Raspinas setup
+  hosts: all
+  roles:
+    - role: system
+      tags: system
+    - role: ssh
+      tags: ssh
+    - role: update
+      tags: update
+    - role: dependencies
+      tags: dependencies
+    - role: mail
+      tags: mail
+    - role: mounts
+      tags: mounts
+    - role: samba
+      tags: samba
+    - role: rclone
+      tags: rclone
+    - role: assetupnp
+      tags: assetupnp
+    - role: minidlna
+      tags: minidlna
+    - role: code
+      tags: code
+    - role: cron
+      tags: cron
+    - role: homeassistant
+      tags: homeassistant

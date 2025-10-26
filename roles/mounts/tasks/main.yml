@@ -1,0 +1,20 @@
+---
+- name: Ensure mount points exist
+  ansible.builtin.file:
+    path: "{{ item.mount_point }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.owner | default('root') }}"
+    mode: '0755'
+  loop: "{{ mounts }}"
+  become: true
+
+- name: Mount USB drives
+  ansible.builtin.mount:
+    path: "{{ item.mount_point }}"
+    src: "{{ item.device }}"
+    fstype: "{{ item.fs_type }}"
+    opts: "{{ item.options | default('defaults') }}"
+    state: mounted
+  loop: "{{ mounts }}"
+  become: true

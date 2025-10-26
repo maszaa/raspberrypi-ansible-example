@@ -1,0 +1,16 @@
+[Unit]
+Description=HEOS Scrobbler
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User={{ ansible_user }}
+ExecStart=bash -c "cd {{ code_heos_scrobbler_path }} && .venv/bin/python main.py"
+StandardOutput=append:{{ code_heos_scrobbler_log_file_path }}
+StandardError=append:{{ code_heos_scrobbler_log_file_path }}
+
+[Install]
+WantedBy=multi-user.target

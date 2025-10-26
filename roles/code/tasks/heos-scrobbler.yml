@@ -1,0 +1,41 @@
+---
+- name: Deploy HEOS scrobbler systemd service
+  ansible.builtin.template:
+    src: systemd/heos-scrobbler.service.j2
+    dest: /etc/systemd/system/heos-scrobbler.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Restart HEOS scrobbler
+
+- name: Create HEOS scrobbler log directory
+  ansible.builtin.file:
+    path: "{{ code_heos_scrobbler_log_path }}"
+    state: directory
+
+- name: Create log file for HEOS scrobbler
+  ansible.builtin.file:
+    path: "{{ code_heos_scrobbler_log_file_path }}"
+    state: touch
+
+- name: Get HEOS scrobbler code
+  ansible.builtin.git:
+    repo: "git@github.com:maszaa/heos-scrobbler.git"
+    key_file: "{{ ansible_user_ssh_key_private_file_path }}"
+    dest: "{{ code_heos_scrobbler_path }}"
+    version: master
+  notify: Restart HEOS scrobbler
+
+- name: Install HEOS scrobbler dependencies
+  ansible.builtin.shell:
+    cmd: bash -ilc "uv sync"
+    chdir: "{{ code_heos_scrobbler_path }}"
+  notify: Restart HEOS scrobbler
+
+- name: Create HEOS scrobbler .secrets.toml file
+  ansible.builtin.template:
+    src: toml/heos-scrobbler.secrets.toml.j2
+    dest: "{{ code_heos_scrobbler_path }}/.secrets.toml"
+    mode: '0600'
+  notify: Restart HEOS scrobbler

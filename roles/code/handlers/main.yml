@@ -1,0 +1,16 @@
+---
+- name: Restart Dy.fi ip updater
+  ansible.builtin.systemd_service:
+    name: dy-fi-ip-updater
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  become: true
+
+- name: Restart HEOS scrobbler
+  ansible.builtin.systemd_service:
+    name: heos-scrobbler
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  become: true

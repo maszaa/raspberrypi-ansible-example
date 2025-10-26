@@ -1,0 +1,45 @@
+---
+- name: Copy AssetUPnP bin folder to {{ assetupnp_bin_path }}
+  ansible.builtin.copy:
+    src: bin/
+    dest: "{{ assetupnp_bin_path }}"
+    owner: root
+    group: root
+    mode: '0755'
+    directory_mode: '0755'
+  become: true
+
+- name: Set permissions for {{ ansible_user }} on AssetUPnP files
+  ansible.builtin.file:
+    path: "{{ assetupnp_bin_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+    recurse: yes
+  become: true
+
+- name: Deploy assetupnp systemd service
+  ansible.builtin.template:
+    src: assetupnp.service.j2
+    dest: /etc/systemd/system/assetupnp.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Copy .dBpoweramp folder to {{ ansible_user }} home directory
+  ansible.builtin.copy:
+    src: .dBpoweramp
+    dest: "{{ ansible_user_home_path }}/"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0755'
+    directory_mode: '0755'
+
+- name: Ensure assetupnp service is enabled and started
+  ansible.builtin.systemd_service:
+    name: assetupnp
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  become: true

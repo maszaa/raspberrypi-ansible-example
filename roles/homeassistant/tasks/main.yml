@@ -1,0 +1,18 @@
+---
+- name: Ensure Homeassistant Docker Compose directory exists
+  ansible.builtin.file:
+    path: "{{ homeassistant_docker_compose_path }}"
+    state: directory
+
+- name: Copy Homeassistant Docker Compose file
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ homeassistant_docker_compose_path }}/docker-compose.yml"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Create and start Homeassistant
+  community.docker.docker_compose_v2:
+    docker_host: "{{ ansible_user_docker_socket}}"
+    project_src: "{{ homeassistant_docker_compose_path }}"

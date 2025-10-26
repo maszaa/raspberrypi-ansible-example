@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Backup upnp_1 NAS
+flock --verbose -n /tmp/rsync-mnt_nas_upnp_1.lock bash {{ code_scripts_path }}/rsync.sh /mnt/nas/upnp_1/ /mnt/backup/upnp_1 > /dev/null &&\
+  curl -fs --retry 3 {{ vault_healtcheck_ping_url_rsync_upnp_1 }} > /dev/null
+
+# Backup files to Google Drive
+flock --verbose -n /tmp/rclone.lock bash {{ code_scripts_path }}/rclone.sh > /dev/null
+
+# Backup upnp_2 NAS
+flock --verbose -n /tmp/rsync-mnt_nas_upnp_2.lock bash {{ code_scripts_path }}/rsync.sh /mnt/nas/upnp_2/ /mnt/backup/upnp_2 > /dev/null &&\
+  curl -fs --retry 3 {{ vault_healtcheck_ping_url_rsync_upnp_2 }} > /dev/null

@@ -1,0 +1,62 @@
+---
+- name: Set up Docker repository
+  ansible.builtin.script: docker-repo-setup.sh
+  args:
+    creates: /etc/apt/sources.list.d/docker.list
+  become: true
+
+- name: Install required packages for Docker rootless mode
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - uidmap
+    - iptables
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-buildx-plugin
+    - docker-compose-plugin
+    - docker-ce-rootless-extras
+  become: true
+
+- name: Disable Docker services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: no
+    state: stopped
+  loop:
+    - docker.service
+    - docker.socket
+  become: true
+
+- name: Remove Docker socket file
+  ansible.builtin.file:
+    path: /var/run/docker.sock
+    state: absent
+  become: true
+
+- name: Add nf_tables module
+  community.general.modprobe:
+    name: nf_tables
+    state: present
+  become: true
+
+- name: Install Docker
+  ansible.builtin.command: dockerd-rootless-setuptool.sh install
+
+- name: Copy Docker config file
+  ansible.builtin.copy:
+    src: docker.config.json
+    dest: "{{ ansible_user_home_path }}/.docker/config.json"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+  notify: Restart Docker rootless service
+
+- name: Ensure Docker installation was successful
+  ansible.builtin.command: docker info
+  register: docker_info
+  failed_when: docker_info.rc != 0
+  changed_when: false

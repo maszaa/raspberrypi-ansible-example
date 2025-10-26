@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+LOGFILE=/tmp/boot.log
+SEPARATOR="---"
+
+rm -f $LOGFILE
+
+NETWORK_OK=1
+until [ "$NETWORK_OK" -eq 0 ]
+do
+  curl -sf -o /dev/null https://www.google.com
+  NETWORK_OK=$?
+  sleep 1
+done
+
+sleep 60
+
+echo -n "<pre>" >> $LOGFILE
+
+lsblk >> $LOGFILE 2>&1
+
+echo $SEPARATOR >> $LOGFILE
+
+df -h >> $LOGFILE 2>&1
+
+echo $SEPARATOR >> $LOGFILE
+
+systemctl status --no-pager assetupnp >> $LOGFILE 2>&1
+systemctl status --no-pager minidlna >> $LOGFILE 2>&1
+systemctl status --no-pager smbd >> $LOGFILE 2>&1
+
+echo -n "</pre>" >> $LOGFILE
+
+mail -a "Content-type: text/html" -s "$HOSTNAME booted at $(date +'%d.%m.%Y %H:%M:%S')" {{ ansible_user }} < $LOGFILE
+
+rm -f $LOGFILE

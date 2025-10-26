@@ -1,0 +1,32 @@
+---
+- name: Copy SSH known_hosts file
+  ansible.builtin.copy:
+    src: known_hosts
+    dest: "{{ ansible_user_ssh_dir }}/known_hosts"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Copy SSH authorized_keys file
+  ansible.builtin.copy:
+    src: authorized_keys
+    dest: "{{ ansible_user_ssh_dir }}/authorized_keys"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Copy SSH public key
+  ansible.builtin.copy:
+    content: "{{ vault_ssh_key_public }}\n\n"
+    dest: "{{ ansible_user_ssh_dir }}/{{ ansible_user_ssh_key_name }}.pub"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0644'
+
+- name: Copy SSH private key
+  ansible.builtin.copy:
+    content: "{{ vault_ssh_key_private }}\n"
+    dest: "{{ ansible_user_ssh_key_private_file_path }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'

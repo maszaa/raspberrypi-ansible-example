@@ -1,0 +1,22 @@
+---
+mounts:
+  - device: PARTUUID=a4970f31-4f0f-4622-8a31-622bb7f26cb0
+    mount_point: /mnt/nas/upnp_1
+    fs_type: ext4
+    options: defaults,noatime,nofail,x-systemd.device-timeout=60
+    owner: "{{ ansible_user }}"
+  - device: PARTUUID=419fdc21-1656-4acf-ad71-fce138c00880
+    mount_point: /mnt/backup/upnp_1
+    fs_type: ext4
+    options: defaults,noatime,nofail,x-systemd.device-timeout=60
+    owner: "{{ ansible_user }}"
+  - device: PARTUUID=dd18ac57-a833-475d-993c-e7df65d8ed5c
+    mount_point: /mnt/nas/upnp_2
+    fs_type: ext4
+    options: defaults,noatime,nofail,x-systemd.device-timeout=60
+    owner: "{{ ansible_user }}"
+  - device: PARTUUID=bc0996ef-54f7-4a0d-b25d-40a3afa08648
+    mount_point: /mnt/backup/upnp_2
+    fs_type: ext4
+    options: defaults,noatime,nofail,x-systemd.device-timeout=60
+    owner: "{{ ansible_user }}"

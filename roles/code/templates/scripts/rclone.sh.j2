@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+LOG_PATH="{{ ansible_user_log_path }}/rclone"
+mkdir -p "$LOG_PATH"
+LOG_FILE="$LOG_PATH/$(date +'%Y-%m').log"
+
+echo "rclone started at $(date +'%d.%m.%Y %H:%M:%S')" >> "$LOG_FILE"
+
+flock --verbose -n /tmp/rclone-mnt_nas_upnp_1.lock rclone -v --fast-list sync /mnt/nas/upnp_1/Music "{{ rclone_google_drive_remote_name }}":upnp_1/Music >> "$LOG_FILE" 2>&1
+flock --verbose -n /tmp/rclone-mnt_nas_upnp_1.lock rclone -v --fast-list sync /mnt/nas/upnp_2/Videos "{{ rclone_google_drive_remote_name }}":upnp_2/Videos >> "$LOG_FILE" 2>&1
+
+echo "rclone ended at $(date +'%d.%m.%Y %H:%M:%S')" >> "$LOG_FILE"
+
+curl -fs --retry 3 {{ vault_healtcheck_ping_url_rclone }} > /dev/null

@@ -1,0 +1,35 @@
+---
+- name: Ensure required dependencies are installed
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  loop:
+    - ca-certificates
+    - curl
+    - libsensors5
+    - rsync
+    - samba
+    - rclone
+    - msmtp
+    - msmtp-mta
+    - bsd-mailx
+    - git
+    - python3
+    - python3-pip
+    - python3-virtualenv
+    - python3-psutil
+    - minidlna
+  become: true
+  tags: dependencies.apt
+
+- name: Install uv
+  ansible.builtin.script: files/uv-installer.sh
+  args:
+    creates: "{{ ansible_user_home_path }}/.local/bin/uv"
+  tags: dependencies.uv
+
+- name: Install Docker
+  ansible.builtin.import_tasks:
+    file: docker.yml
+  tags: dependencies.docker

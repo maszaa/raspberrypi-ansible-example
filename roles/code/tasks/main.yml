@@ -1,0 +1,37 @@
+---
+- name: Create log directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_log_path }}"
+    state: directory
+
+- name: Create code directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ code_path }}"
+    - "{{ code_scripts_path }}"
+
+- name: Create scripts
+  ansible.builtin.template:
+    src: "scripts/{{ item }}.j2"
+    dest: "{{ code_scripts_path }}/{{ item }}"
+    mode: '0755'
+  loop:
+    - assetupnp_rescan.sh
+    - boot-check.sh
+    - file_operations.sh
+    - rclone.sh
+    - rsync.sh
+    - system_checks.py
+  tags: code.scripts
+
+- name: Setup Dy.fi ip updater
+  ansible.builtin.import_tasks:
+    file: dy-fi-ip-updater.yml
+  tags: code.dy-fi-ip-updater
+
+- name: Setup HEOS scrobbler
+  ansible.builtin.import_tasks:
+    file: heos-scrobbler.yml
+  tags: code.heos-scrobbler

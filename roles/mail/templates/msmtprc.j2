@@ -1,0 +1,29 @@
+# Set default values for all following accounts.
+defaults
+
+# Use the mail submission port 587 instead of the SMTP port 25.
+port 587
+
+# Always use TLS.
+auth on
+tls on
+
+# Set a list of trusted CAs for TLS. The default is to use system settings, but
+# you can select your own file.
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+
+# user specific log location, otherwise use /var/log/msmtp.log
+logfile ~/.msmtp.log
+
+# The SMTP details for Gmail
+account gmail
+host smtp.gmail.com
+from {{ vault_mail_user }}
+user {{ vault_mail_user }}
+password {{ vault_mail_password }}
+
+# Set default account to gmail
+account default : gmail
+
+# Map local users to mail addresses
+aliases /etc/aliases

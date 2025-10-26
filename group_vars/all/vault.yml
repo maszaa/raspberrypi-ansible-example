@@ -1,0 +1,31 @@
+# Replace this file with your Ansible Vault file.
+vault_ssh_key_public: "<public key content>"
+vault_ssh_key_private: |
+  <private key content>
+
+vault_mail_user: ""
+vault_mail_password: ""
+vault_mail_default_to: ""
+
+vault_samba_user_password: ""
+
+vault_rclone_client_id: ""
+vault_rclone_client_secret: ""
+vault_rclone_root_folder_id: ""
+vault_rclone_token: '"{token content as JSON}"'
+
+vault_assetupnp_pin: ""
+
+vault_dy_fi_ip_updater_dy_username: ""
+vault_dy_fi_ip_updater_dy_password: ""
+vault_dy_fi_ip_updater_dy_domains: ""
+
+vault_heos_scrobbler_last_fm_api_key: ""
+vault_heos_scrobbler_last_fm_api_secret: ""
+vault_heos_scrobbler_last_fm_username: ""
+vault_heos_scrobbler_last_fm_password: ""
+
+vault_healtcheck_ping_url_assetupnp_rescan: ""
+vault_healtcheck_ping_url_rsync_upnp: ""
+vault_healtcheck_ping_url_rsync_upnp_bd_1: ""
+vault_healtcheck_ping_url_rclone: ""

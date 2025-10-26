@@ -1,0 +1,18 @@
+---
+- name: Deploy msmtprc configuration file
+  ansible.builtin.template:
+    src: msmtprc.j2
+    dest: /etc/msmtprc
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Deploy mail aliases file
+  ansible.builtin.template:
+    src: aliases.j2
+    dest: /etc/aliases
+    owner: root
+    group: root
+    mode: '0644'
+  become: true

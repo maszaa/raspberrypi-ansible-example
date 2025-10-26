@@ -1,0 +1,31 @@
+---
+- name: Ensure Samba service is enabled and started
+  ansible.builtin.systemd_service:
+    name: smbd
+    state: started
+    enabled: yes
+  become: true
+
+- name: Add {{ ansible_user }} as Samba user
+  ansible.builtin.command:
+    cmd: "smbpasswd -a {{ ansible_user }} -s"
+    stdin: |
+      {{ vault_samba_user_password }}
+      {{ vault_samba_user_password }}
+  become: true
+
+- name: Deploy Samba configuration
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Restart Samba
+  ansible.builtin.systemd_service:
+    name: smbd
+    state: restarted
+    daemon_reload: yes
+  become: true

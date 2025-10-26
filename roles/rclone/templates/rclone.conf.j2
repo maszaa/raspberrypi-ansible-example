@@ -1,0 +1,7 @@
+[{{ rclone_google_drive_remote_name }}]
+type = drive
+client_id = {{ vault_rclone_client_id }}
+client_secret = {{ vault_rclone_client_secret }}
+scope = drive.file
+root_folder_id = {{ vault_rclone_root_folder_id }}
+token = {{ vault_rclone_token }}

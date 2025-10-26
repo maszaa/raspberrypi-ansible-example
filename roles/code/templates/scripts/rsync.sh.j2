@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ]
+then
+  >&2 echo "Provide source and destination, please"
+  exit 1
+fi
+
+SOURCE="$1"
+DESTINATION="$2"
+
+LOG_PATH="{{ ansible_user_log_path }}/rsync"
+mkdir -p "$LOG_PATH"
+LOG_FILE="$LOG_PATH/${SOURCE//\//_}_$(date +'%Y-%m').log"
+
+echo "Backup started at $(date +'%d.%m.%Y %H:%M:%S')" >> "$LOG_FILE"
+
+rsync -vaxWXS --delete "$SOURCE" "$DESTINATION" >> "$LOG_FILE"
+
+echo "Backup ended at $(date +'%d.%m.%Y %H:%M:%S')" >> "$LOG_FILE"

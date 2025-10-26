@@ -1,0 +1,16 @@
+[Unit]
+Description=Dy.fi ip updater
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User={{ ansible_user }}
+ExecStart=bash -c "cd {{ code_dy_fi_ip_updater_path }} && bash run.sh"
+StandardOutput=append:{{ code_dy_fi_ip_updater_log_file_path }}
+StandardError=append:{{ code_dy_fi_ip_updater_log_file_path }}
+
+[Install]
+WantedBy=multi-user.target

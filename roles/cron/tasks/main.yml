@@ -1,0 +1,5 @@
+---
+- name: Add cronbjobs
+  ansible.builtin.cron: "{{ item }}"
+  loop: "{{ cronjobs }}"
+  become: true

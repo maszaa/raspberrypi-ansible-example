@@ -1,0 +1,125 @@
+import datetime
+import json
+import logging
+import psutil
+import sys
+
+class SystemCheckException(Exception):
+  def __init__(self, *args, **kwargs):
+    self.data = kwargs.get("data", "")
+
+class RAMUsageTooHigh(SystemCheckException):
+  pass
+
+class CPUTemperatureTooHigh(SystemCheckException):
+  pass
+
+class CPUUsageTooHigh(SystemCheckException):
+  pass
+
+class DiskUsageTooHigh(SystemCheckException):
+  pass
+
+class SystemCheck:
+  def __init__(self, *args, **kwargs):
+    pass
+
+  def check(self):
+    raise NotImplementedError(f"Class {self.__class__.__name__} must implement 'check' function!")
+
+class RAMUsageCheck(SystemCheck):
+  EXCEPTION = RAMUsageTooHigh
+  THRESHOLD = 0.1
+
+  def check(self):
+    ram_usage = psutil.virtual_memory()
+
+    if ram_usage.available / ram_usage.total < self.THRESHOLD:
+      raise self.EXCEPTION(data=dict(ram_usage._asdict()))
+
+class CPUTemperatureCheck(SystemCheck):
+  EXCEPTION = CPUTemperatureTooHigh
+  THRESHOLD = 70
+
+  def check(self):
+    problems = {}
+    cpu_temperature = psutil.sensors_temperatures()
+
+    for key, value in cpu_temperature.items():
+      for measurement in value:
+        if measurement.current > self.THRESHOLD or measurement.critical:
+          problem = problems.get(key, [])
+          problem.append(dict(measurement._asdict()))
+          problems[key] = problem
+
+    if problems:
+      raise self.EXCEPTION(data=problems)
+
+class CPUUsageCheck(SystemCheck):
+  EXCEPTION = CPUUsageTooHigh
+  THRESHOLD = 90
+  LOAD_15_MIN = 2
+  LOAD_PERIODS = (1, 5, 15)
+  CPU_COUNT = psutil.cpu_count()
+  CPU_PERCENT_INTERVAL = 5.0
+  HEAVY_LOAD_HOURS = range(3, 6)
+
+  def check(self):
+    if datetime.datetime.now().hour not in self.HEAVY_LOAD_HOURS:
+      cpu_usage = psutil.cpu_percent(interval=self.CPU_PERCENT_INTERVAL)
+      if cpu_usage >= self.THRESHOLD:
+        raise self.EXCEPTION(data={"usage": f"{cpu_usage} %"})
+    else:
+      cpu_usage = [load / self.CPU_COUNT * 100
+                  for load in psutil.getloadavg()]
+
+      if cpu_usage[self.LOAD_15_MIN] > self.THRESHOLD:
+        raise self.EXCEPTION(data={f"{period} min": f"{load} %" for period, load in zip(self.LOAD_PERIODS, cpu_usage)})
+
+class DiskUsageCheck(SystemCheck):
+  EXCEPTION = DiskUsageTooHigh
+  THRESHOLD = 95
+  PATHS = [
+    "/",
+    "/mnt/nas/upnp_1",
+    "/mnt/nas/upnp_2",
+    "/mnt/backup/upnp_1",
+    "/mnt/backup/upnp_2"
+  ]
+
+  def check(self):
+    problems = {}
+
+    for path in self.PATHS:
+      disk_usage = psutil.disk_usage(path)
+      if disk_usage.percent > self.THRESHOLD:
+        problems[path] = dict(disk_usage._asdict())
+
+    if problems:
+      raise self.EXCEPTION(data=problems)
+
+SYSTEM_CHECKS = (
+  RAMUsageCheck,
+  CPUTemperatureCheck,
+  DiskUsageCheck,
+  CPUUsageCheck
+)
+SYSTEM_CHECK_EXCEPTIONS = (
+  RAMUsageTooHigh,
+  CPUTemperatureTooHigh,
+  DiskUsageTooHigh,
+  CPUUsageTooHigh
+)
+
+def main():
+  logger = logging.getLogger(__name__)
+
+  for system_check in SYSTEM_CHECKS:
+    try:
+      system_check().check()
+    except SYSTEM_CHECK_EXCEPTIONS as err:
+      logger.critical(err.__class__.__name__)
+      logger.critical(json.dumps(err.data, indent=2))
+
+if __name__ == "__main__":
+  main()

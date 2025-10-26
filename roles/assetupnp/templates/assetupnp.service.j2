@@ -1,0 +1,15 @@
+[Unit]
+Description=Asset UPnP
+Requires=mnt-nas-upnp_1.mount
+After=network.target mnt-nas-upnp_1.mount
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User={{ ansible_user }}
+ExecStart={{ assetupnp_bin_path }}/AssetUPnP
+
+[Install]
+WantedBy=multi-user.target
