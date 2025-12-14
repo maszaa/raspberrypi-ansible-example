@@ -51,7 +51,7 @@ The Ansible configuration is structuded as such:
     * `homeassistant/`: Configuration for initializing [Homeassistant](https://www.home-assistant.io/) as a Docker container
         * `tasks/main.yml`: Tasks for setupping
         * `templates/docker-compose.yml.j2`: Docker Compose configuration for the container
-            * I couldn't get `network_mode: host` to work so mDNS unfortunately doesn't work for me
+            * `network_mode: host` doesn't work with rootless Docker so mDNS unfortunately doesn't work for me
         * `vars/main.yml`: Variables for this role
     * `mail/`: Tasks for adding mail sending capabilities to the host
         * `tasks/main.yml`: Tasks for setupping mail configuration
